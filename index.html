@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.28</title>
+    <title>制度通知システム v3.29</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -83,11 +83,20 @@
         window.addEventListener('popstate', () => {
             const newPage = getPageFromHash();
             if (newPage === 'list' && currentPage === 'list') {
-                // 一覧→詳細→一覧バック時：✓ボタンの状態だけ更新
                 updateCheckButtons();
             } else {
                 currentPage = newPage;
                 render();
+            }
+        });
+
+        // BFCache対応：フリックバック時にlocalStorageから再読み込み
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                // BFCacheから復元された場合、localStorageを再読み込みして表示更新
+                readIds = new Set(JSON.parse(localStorage.getItem('readIds') || '[]'));
+                newIds = new Set(JSON.parse(localStorage.getItem('newIds') || '[]'));
+                updateCheckButtons();
             }
         });
         let isLoading = false;
