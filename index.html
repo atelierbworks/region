@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.38</title>
+    <title>制度通知システム v3.39</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -91,43 +91,13 @@
         });
 
         // BFCache対応：フリックバック時にlocalStorageから再読み込みして完全再描画
-        // スクロール連動ヘッダ（下スクロールで隠れ、上スクロールで出る）
-        let lastScrollY = 0;
-        let headerHidden = false;
 
-        function applyHeaderState() {
-            const headerEl = document.querySelector('.sticky-header');
-            if (!headerEl) return;
-            headerEl.style.transform = headerHidden ? 'translateY(-100%)' : 'translateY(0)';
-        }
-
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 60) {
-                headerHidden = true;
-            } else {
-                headerHidden = false;
-            }
-            applyHeaderState();
-            lastScrollY = currentScrollY;
-        }, { passive: true });
 
         // フリックバック時の状態更新（BFCache対応）
         window.addEventListener('pageshow', () => {
-            // ちらつき防止：先にヘッダを隠してからrender
-            const headerEl = document.querySelector('.sticky-header');
-            if (headerEl && headerHidden) {
-                headerEl.style.transition = 'none';
-                headerEl.style.transform = 'translateY(-100%)';
-            }
             readIds = new Set(JSON.parse(localStorage.getItem('readIds') || '[]'));
             newIds = new Set(JSON.parse(localStorage.getItem('newIds') || '[]'));
             render();
-            // transitionを戻す
-            requestAnimationFrame(() => {
-                const h = document.querySelector('.sticky-header');
-                if (h) h.style.transition = '';
-            });
         });
         let isLoading = false;
         let statusMessage = '';
@@ -324,7 +294,7 @@
 
             return `
                 <div class="min-h-screen bg-gray-50">
-                    <div style="background:${theme === 'dark' ? '#1e3a5f' : '#2563eb'};transition:transform 0.3s ease;" class="sticky-header text-white shadow-lg sticky top-0 z-10">
+                    <div style="background:${theme === 'dark' ? '#1e3a5f' : '#2563eb'};transition:transform 0.3s ease;" class="text-white shadow-lg sticky top-0 z-10">
                         <div class="container mx-auto px-4 pt-4 pb-3">
                             <div class="flex items-center justify-between mb-3">
                                 <button onclick="goToHome()" class="text-sm hover:underline">← トップに戻る</button>
