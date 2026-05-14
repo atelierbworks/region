@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.41</title>
+    <title>制度通知システム v3.43</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -364,11 +364,17 @@
         function saveCity(event) {
             event.preventDefault();
             const city = document.getElementById('cityInput').value.trim();
-            if (city) {
+            if (city && city !== savedCity) {
                 localStorage.setItem('parentCity', city);
                 savedCity = city;
-                render();
+                // 都市変更時はlastFetchedAtのみクリア（新しい都市の全件を取得）
+                localStorage.removeItem('lastFetchedAt');
+                lastFetchedAt = null;
+            } else if (city) {
+                localStorage.setItem('parentCity', city);
+                savedCity = city;
             }
+            render();
         }
 
         function setStatusFilter(s) {
