@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.29</title>
+    <title>制度通知システム v3.30</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -90,15 +90,19 @@
             }
         });
 
-        // BFCache対応：フリックバック時にlocalStorageから再読み込み
+        // BFCache対応：フリックバック時にlocalStorageから再読み込みして完全再描画
         window.addEventListener('pageshow', (e) => {
             if (e.persisted) {
-                // BFCacheから復元された場合、localStorageを再読み込みして表示更新
                 readIds = new Set(JSON.parse(localStorage.getItem('readIds') || '[]'));
                 newIds = new Set(JSON.parse(localStorage.getItem('newIds') || '[]'));
-                updateCheckButtons();
+                statusFilter = localStorage.getItem('statusFilter') || 'all';
+                categoryFilters = JSON.parse(localStorage.getItem('categoryFilters') || '[]');
+                render();
             }
         });
+
+        // BFCacheを無効化（Unload eventを登録するだけで無効になる）
+        window.addEventListener('unload', () => {});
         let isLoading = false;
         let statusMessage = '';
 
