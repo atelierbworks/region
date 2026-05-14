@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.31</title>
+    <title>制度通知システム v3.32</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -115,9 +115,10 @@
 
             try {
                 const since = localStorage.getItem('lastFetchedAt');
+                const cityParam = savedCity ? `&city=${encodeURIComponent(savedCity)}` : '';
                 const url = since
-                    ? `${API_URL}?since=${encodeURIComponent(since)}`
-                    : API_URL;
+                    ? `${API_URL}?since=${encodeURIComponent(since)}${cityParam}`
+                    : `${API_URL}?${cityParam ? cityParam.slice(1) : ''}`;
 
                 const response = await fetch(url);
 
