@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.30</title>
+    <title>制度通知システム v3.31</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -95,9 +95,7 @@
             if (e.persisted) {
                 readIds = new Set(JSON.parse(localStorage.getItem('readIds') || '[]'));
                 newIds = new Set(JSON.parse(localStorage.getItem('newIds') || '[]'));
-                statusFilter = localStorage.getItem('statusFilter') || 'all';
-                categoryFilters = JSON.parse(localStorage.getItem('categoryFilters') || '[]');
-                render();
+                updateCheckButtons();
             }
         });
 
