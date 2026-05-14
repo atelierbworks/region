@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.36</title>
+    <title>制度通知システム v3.37</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -93,15 +93,22 @@
         // BFCache対応：フリックバック時にlocalStorageから再読み込みして完全再描画
         // スクロール連動ヘッダ（下スクロールで隠れ、上スクロールで出る）
         let lastScrollY = 0;
-        window.addEventListener('scroll', () => {
+        let headerHidden = false;
+
+        function applyHeaderState() {
             const headerEl = document.querySelector('.sticky-header');
             if (!headerEl) return;
+            headerEl.style.transform = headerHidden ? 'translateY(-100%)' : 'translateY(0)';
+        }
+
+        window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
             if (currentScrollY > lastScrollY && currentScrollY > 60) {
-                headerEl.style.transform = 'translateY(-100%)';
+                headerHidden = true;
             } else {
-                headerEl.style.transform = 'translateY(0)';
+                headerHidden = false;
             }
+            applyHeaderState();
             lastScrollY = currentScrollY;
         }, { passive: true });
 
