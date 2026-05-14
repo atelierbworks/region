@@ -108,6 +108,9 @@
         async function fetchNotices() {
             isLoading = true;
             statusMessage = '最新情報を取得中...';
+            // 取得時に前回のNewをクリア（今回の新着だけをNewにする）
+            newIds = new Set();
+            localStorage.setItem('newIds', JSON.stringify([]));
             render();
 
             try {
