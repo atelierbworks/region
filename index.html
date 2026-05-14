@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>制度通知システム v3.39</title>
+    <title>制度通知システム v3.40</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -69,6 +69,7 @@
         let lastFetchedAt = localStorage.getItem('lastFetchedAt') || null;
         // statusFilter: 'all' | 'unread' | 'read'
         let statusFilter = localStorage.getItem('statusFilter') || 'all';
+        let categoryOpen = false;
         // categoryFilters: [] = すべて, [...] = 選択カテゴリ（OR条件）
         let categoryFilters = JSON.parse(localStorage.getItem('categoryFilters') || '[]');
         const _savedRaw = localStorage.getItem('interests');
