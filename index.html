@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.45</title>
+    <title>Local Note v3.46</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -254,7 +254,7 @@
                             <div class="space-y-4">
                                 <button onclick="goToList()"
                                     class="w-full bg-green-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-green-700 text-lg shadow-lg">
-                                    制度一覧を見る（${filtered.length}件）→
+                                    制度一覧を見る（${filtered.length}件）
                                 </button>
                                 <button onclick="fetchNotices()"
                                     ${isLoading ? 'disabled' : ''}
@@ -301,12 +301,12 @@
                 <div class="min-h-screen bg-gray-50">
                     <div style="background:${theme === 'dark' ? '#1e3a5f' : '#2563eb'};" class="text-white shadow-lg sticky top-0 z-10">
                         <div class="px-4 pt-3 pb-2">
-                            <div class="header-row1 mb-2">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                                 <button onclick="goToHome()" class="text-sm hover:underline" style="white-space:nowrap;">← 戻る</button>
-                                <div class="header-status">
+                                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
                                     ${statusBtns}
-                                    <button onclick="toggleTheme()" title="テーマ切り替え" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:16px;color:white;">${theme === 'dark' ? '☀️' : '🌙'}</button>
                                 </div>
+                                <button onclick="toggleTheme()" title="テーマ切り替え" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:16px;color:white;white-space:nowrap;">${theme === 'dark' ? '☀️' : '🌙'}</button>
                             </div>
                         </div>
                         <div style="background:${theme === 'dark' ? '#162d4a' : '#1d4ed8'};padding:6px 16px 8px;">
