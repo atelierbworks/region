@@ -191,6 +191,8 @@
         function getUnreadCount() {
             return notices.filter(n => {
                 if (savedCity && !n.city.includes(savedCity) && !savedCity.includes(n.city.replace('（東京）','').replace('（大阪）',''))) return false;
+                const cat = CATEGORIES.includes(n.normalizedCategory) ? n.normalizedCategory : 'その他';
+                if (categoryFilters.length > 0 && !categoryFilters.includes(cat)) return false;
                 return !readIds.has(n.id);
             }).length;
         }
