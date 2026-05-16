@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.52</title>
+    <title>Local Note v3.54</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -77,7 +77,7 @@
         let categoryOpen = false;
         // categoryFilters: [] = すべて, [...] = 選択カテゴリ（OR条件）
         const DEFAULT_CATEGORIES = ['子育て・教育', '健康・福祉', 'くらし・手続き', '防災・安全'];
-        let categoryFilters = JSON.parse(localStorage.getItem('categoryFilters') || JSON.stringify(DEFAULT_CATEGORIES));
+        let categoryFilters = JSON.parse(localStorage.getItem('categoryFilters_v2') || JSON.stringify(DEFAULT_CATEGORIES));
         const _savedRaw = localStorage.getItem('interests');
         let savedInterests = _savedRaw ? JSON.parse(_savedRaw) : DEFAULT_INTERESTS;
         function getPageFromHash() {
@@ -422,7 +422,7 @@
                 if (idx >= 0) categoryFilters.splice(idx, 1);
                 else categoryFilters.push(c);
             }
-            localStorage.setItem('categoryFilters', JSON.stringify(categoryFilters));
+            localStorage.setItem('categoryFilters_v2', JSON.stringify(categoryFilters));
             render();
         }
 
@@ -467,6 +467,7 @@
             categoryFilters = [];
             localStorage.removeItem('statusFilter');
             localStorage.removeItem('categoryFilters');
+            localStorage.removeItem('categoryFilters_v2');
             statusMessage = 'ローカルデータをリセットしました';
             render();
         }
