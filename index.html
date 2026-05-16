@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.50</title>
+    <title>Local Note v3.52</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -109,7 +109,7 @@
         let isLoading = false;
         let statusMessage = '';
         let expandedIds = new Set();
-        let showAllBenefits = false;
+        let benefitFilter = 'benefit'; // 'benefit' | 'all' | 'nobenefit'
 
         // ---- API取得 ----
         async function fetchNotices() {
@@ -181,7 +181,8 @@
                 const isRead = readIds.has(n.id);
                 if (statusFilter === 'unread' && isRead) return false;
                 if (statusFilter === 'read' && !isRead) return false;
-                if (!showAllBenefits && n.hasDirectBenefit === false) return false;
+                if (benefitFilter === 'benefit' && n.hasDirectBenefit === false) return false;
+                if (benefitFilter === 'nobenefit' && n.hasDirectBenefit !== false) return false;
                 return true;
             });
             return filtered.sort((a, b) => {
@@ -196,7 +197,8 @@
                 if (savedCity && !n.city.includes(savedCity) && !savedCity.includes(n.city.replace('（東京）','').replace('（大阪）',''))) return false;
                 const cat = CATEGORIES.includes(n.normalizedCategory) ? n.normalizedCategory : 'その他';
                 if (categoryFilters.length > 0 && !categoryFilters.includes(cat)) return false;
-                if (!showAllBenefits && n.hasDirectBenefit === false) return false;
+                if (benefitFilter === 'benefit' && n.hasDirectBenefit === false) return false;
+                if (benefitFilter === 'nobenefit' && n.hasDirectBenefit !== false) return false;
                 return !readIds.has(n.id);
             }).length;
         }
@@ -216,7 +218,8 @@
             const filtered = notices.filter(n => {
                 if (!savedCity) return false;
                 if (!n.city.includes(savedCity) && !savedCity.includes(n.city.replace('（東京）','').replace('（大阪）',''))) return false;
-                if (!showAllBenefits && n.hasDirectBenefit === false) return false;
+                if (benefitFilter === 'benefit' && n.hasDirectBenefit === false) return false;
+                if (benefitFilter === 'nobenefit' && n.hasDirectBenefit !== false) return false;
                 return true;
             });
 
@@ -318,7 +321,7 @@
                                 <button onclick="toggleTheme()" title="テーマ切り替え" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:16px;color:white;">${theme === 'dark' ? '☀️' : '🌙'}</button>
                             </div>
                             <div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:center;">
-                                <button onclick="toggleShowAllBenefits()" style="padding:4px 10px;border-radius:999px;font-size:12px;white-space:nowrap;cursor:pointer;border:1.5px solid rgba(255,255,255,0.7);background:${showAllBenefits?'rgba(255,255,255,0.3)':'transparent'};color:white;flex-shrink:0;">${showAllBenefits?'全件':'実利のみ'}</button>
+                                <button onclick="toggleBenefitFilter()" style="padding:4px 10px;border-radius:999px;font-size:12px;white-space:nowrap;cursor:pointer;border:1.5px solid rgba(255,255,255,0.7);background:${benefitFilter!=='benefit'?'rgba(255,255,255,0.3)':'transparent'};color:white;flex-shrink:0;">${benefitFilter==='benefit'?'実利のみ':benefitFilter==='all'?'全件':'実利なし'}</button>
                                 ${statusBtns}
                             </div>
                         </div>
@@ -523,8 +526,10 @@
             render();
         }
 
-        function toggleShowAllBenefits() {
-            showAllBenefits = !showAllBenefits;
+        function toggleBenefitFilter() {
+            if (benefitFilter === 'benefit') benefitFilter = 'all';
+            else if (benefitFilter === 'all') benefitFilter = 'nobenefit';
+            else benefitFilter = 'benefit';
             render();
         }
 
