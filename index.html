@@ -76,7 +76,8 @@
         let statusFilter = localStorage.getItem('statusFilter') || 'all';
         let categoryOpen = false;
         // categoryFilters: [] = すべて, [...] = 選択カテゴリ（OR条件）
-        let categoryFilters = JSON.parse(localStorage.getItem('categoryFilters') || '[]');
+        const DEFAULT_CATEGORIES = ['子育て・教育', '健康・福祉', 'くらし・手続き', '防災・安全'];
+        let categoryFilters = JSON.parse(localStorage.getItem('categoryFilters') || JSON.stringify(DEFAULT_CATEGORIES));
         const _savedRaw = localStorage.getItem('interests');
         let savedInterests = _savedRaw ? JSON.parse(_savedRaw) : DEFAULT_INTERESTS;
         function getPageFromHash() {
