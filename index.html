@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.49</title>
+    <title>Local Note v3.50</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -108,6 +108,7 @@
         let isLoading = false;
         let statusMessage = '';
         let expandedIds = new Set();
+        let showAllBenefits = false;
 
         // ---- API取得 ----
         async function fetchNotices() {
@@ -179,6 +180,7 @@
                 const isRead = readIds.has(n.id);
                 if (statusFilter === 'unread' && isRead) return false;
                 if (statusFilter === 'read' && !isRead) return false;
+                if (!showAllBenefits && n.hasDirectBenefit === false) return false;
                 return true;
             });
             return filtered.sort((a, b) => {
@@ -193,6 +195,7 @@
                 if (savedCity && !n.city.includes(savedCity) && !savedCity.includes(n.city.replace('（東京）','').replace('（大阪）',''))) return false;
                 const cat = CATEGORIES.includes(n.normalizedCategory) ? n.normalizedCategory : 'その他';
                 if (categoryFilters.length > 0 && !categoryFilters.includes(cat)) return false;
+                if (!showAllBenefits && n.hasDirectBenefit === false) return false;
                 return !readIds.has(n.id);
             }).length;
         }
@@ -510,6 +513,11 @@
             } else {
                 expandedIds.add(id);
             }
+            render();
+        }
+
+        function toggleShowAllBenefits() {
+            showAllBenefits = !showAllBenefits;
             render();
         }
 
