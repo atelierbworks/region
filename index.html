@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.47</title>
+    <title>Local Note v3.49</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -357,6 +357,7 @@
                                                 <span class="text-gray-400 text-xs" style="white-space:nowrap;">${new Date(n.pubdate || n.fetchedAt).toLocaleDateString('ja-JP')}</span>
                                             </div>
                                             <p style="font-size:15px;font-weight:600;color:${theme==='dark'?'#f1f5f9':'#1e293b'};margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.title}</p>
+                                            <span style="font-size:11px;padding:1px 6px;border-radius:4px;background:${n.hasDirectBenefit===false?'#fee2e2':'#dcfce7'};color:${n.hasDirectBenefit===false?'#dc2626':'#16a34a'};">${n.hasDirectBenefit===false?'実利なし':'実利あり'}</span>
                                         </div>
                                         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                                             ${checkBtn}
