@@ -212,7 +212,12 @@
 
         // ---- ホームページ ----
         function renderHomePage() {
-            const filtered = notices.filter(n => savedCity && (n.city.includes(savedCity) || savedCity.includes(n.city.replace('（東京）','').replace('（大阪）',''))));
+            const filtered = notices.filter(n => {
+                if (!savedCity) return false;
+                if (!n.city.includes(savedCity) && !savedCity.includes(n.city.replace('（東京）','').replace('（大阪）',''))) return false;
+                if (!showAllBenefits && n.hasDirectBenefit === false) return false;
+                return true;
+            });
 
             return `
                 <div class="container mx-auto px-4 py-8 md:py-16">
@@ -311,7 +316,8 @@
                                 <button onclick="goToHome()" class="text-sm hover:underline" style="white-space:nowrap;">← 戻る</button>
                                 <button onclick="toggleTheme()" title="テーマ切り替え" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:16px;color:white;">${theme === 'dark' ? '☀️' : '🌙'}</button>
                             </div>
-                            <div style="display:flex;gap:6px;flex-wrap:nowrap;">
+                            <div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:center;">
+                                <button onclick="toggleShowAllBenefits()" style="padding:4px 10px;border-radius:999px;font-size:12px;white-space:nowrap;cursor:pointer;border:1.5px solid rgba(255,255,255,0.7);background:${showAllBenefits?'rgba(255,255,255,0.3)':'transparent'};color:white;flex-shrink:0;">${showAllBenefits?'全件':'実利のみ'}</button>
                                 ${statusBtns}
                             </div>
                         </div>
