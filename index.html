@@ -254,9 +254,6 @@
                                     <select id="prefSelect" onchange="onPrefChange()"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="">選択してください</option>
-                                        ${[...new Set(notices.map(n => n.prefecture).filter(Boolean))].sort().map(p =>
-                                            \`<option value="\${p}" \${p === savedPref ? 'selected' : ''}>\${p}</option>\`
-                                        ).join('')}
                                     </select>
                                 </div>
                                 <div>
@@ -264,9 +261,6 @@
                                     <select id="citySelect"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="">都道府県を先に選択</option>
-                                        ${savedPref ? [...new Set(notices.filter(n => n.prefecture === savedPref).map(n => n.city))].sort().map(c =>
-                                            \`<option value="\${c}" \${c === savedCity ? 'selected' : ''}>\${c}</option>\`
-                                        ).join('') : ''}
                                     </select>
                                 </div>
                                 <button onclick="saveCityFromSelect()" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700">
@@ -545,13 +539,25 @@
             render();
         }
 
+        function populatePrefSelect() {
+            const sel = document.getElementById('prefSelect');
+            if (!sel) return;
+            const prefs = [...new Set(notices.map(n => n.prefecture).filter(Boolean))].sort();
+            sel.innerHTML = '<option value="">選択してください</option>' +
+                prefs.map(p => '<option value="' + p + '"' + (p === savedPref ? ' selected' : '') + '>' + p + '</option>').join('');
+            if (savedPref) populateCitySelect(savedPref);
+        }
+
+        function populateCitySelect(pref) {
+            const sel = document.getElementById('citySelect');
+            if (!sel) return;
+            const cities = [...new Set(notices.filter(n => n.prefecture === pref).map(n => n.city))].sort();
+            sel.innerHTML = cities.map(c => '<option value="' + c + '"' + (c === savedCity ? ' selected' : '') + '>' + c + '</option>').join('');
+        }
+
         function onPrefChange() {
             const pref = document.getElementById('prefSelect').value;
-            const citySelect = document.getElementById('citySelect');
-            const cities = [...new Set(notices.filter(n => n.prefecture === pref).map(n => n.city))].sort();
-            citySelect.innerHTML = cities.length
-                ? cities.map(c => \`<option value="\${c}">\${c}</option>\`).join('')
-                : '<option value="">該当なし</option>';
+            populateCitySelect(pref);
         }
 
         function saveCityFromSelect() {
