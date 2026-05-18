@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.56</title>
+    <title>Local Note v3.57</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -579,6 +579,11 @@
 
         // 初期レンダリング
         render();
+
+        // noticesが空の場合は自動的に全件取得（都道府県選択肢を生成するため）
+        if (notices.length === 0) {
+            fetchNotices();
+        }
     </script>
 </body>
 </html>
