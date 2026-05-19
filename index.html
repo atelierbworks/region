@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.58</title>
+    <title>Local Note v3.59</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -559,7 +559,7 @@
 
         async function fetchPrefList() {
             try {
-                const res = await fetch(API_URL + '?mode=prefectures');
+                const res = await fetch('https://seido-notify-api-646437906593.asia-northeast1.run.app/getPrefectures');
                 prefList = await res.json();
                 populatePrefSelect();
             } catch (err) {
