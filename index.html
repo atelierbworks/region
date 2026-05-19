@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.57</title>
+    <title>Local Note v3.58</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -68,6 +68,7 @@
         let notices = JSON.parse(localStorage.getItem('notices') || '[]');
         let savedCity = localStorage.getItem('parentCity') || '';
         let savedPref = localStorage.getItem('parentPref') || '';
+        let prefList = {}; // { '神奈川県': ['横浜市', ...], ... }
         const CATEGORIES = ['子育て・教育','健康・福祉','くらし・手続き','ビジネス','防災・安全','その他'];
         const DEFAULT_INTERESTS = CATEGORIES;
         let readIds = new Set(JSON.parse(localStorage.getItem('readIds') || '[]'));
@@ -542,7 +543,7 @@
         function populatePrefSelect() {
             const sel = document.getElementById('prefSelect');
             if (!sel) return;
-            const prefs = [...new Set(notices.map(n => n.prefecture).filter(Boolean))].sort();
+            const prefs = Object.keys(prefList).sort();
             sel.innerHTML = '<option value="">選択してください</option>' +
                 prefs.map(p => '<option value="' + p + '"' + (p === savedPref ? ' selected' : '') + '>' + p + '</option>').join('');
             if (savedPref) populateCitySelect(savedPref);
@@ -551,8 +552,19 @@
         function populateCitySelect(pref) {
             const sel = document.getElementById('citySelect');
             if (!sel) return;
-            const cities = [...new Set(notices.filter(n => n.prefecture === pref).map(n => n.city))].sort();
-            sel.innerHTML = cities.map(c => '<option value="' + c + '"' + (c === savedCity ? ' selected' : '') + '>' + c + '</option>').join('');
+            const cities = (prefList[pref] || []);
+            sel.innerHTML = '<option value="">選択してください</option>' +
+                cities.map(c => '<option value="' + c + '"' + (c === savedCity ? ' selected' : '') + '>' + c + '</option>').join('');
+        }
+
+        async function fetchPrefList() {
+            try {
+                const res = await fetch(API_URL + '?mode=prefectures');
+                prefList = await res.json();
+                populatePrefSelect();
+            } catch (err) {
+                console.error('都道府県リスト取得エラー:', err);
+            }
         }
 
         function onPrefChange() {
@@ -580,7 +592,10 @@
         // 初期レンダリング
         render();
 
-        // noticesが空の場合は自動的に全件取得（都道府県選択肢を生成するため）
+        // 起動時に都道府県リストを取得
+        fetchPrefList();
+
+        // 初回：noticesが空の場合は全件取得
         if (notices.length === 0) {
             fetchNotices();
         }
