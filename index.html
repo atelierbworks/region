@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.60</title>
+    <title>Local Note v3.61</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -252,21 +252,21 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-gray-700 font-medium mb-2">都道府県</label>
-                                    <select id="prefSelect" onchange="onPrefChange()"
+                                    <input id="prefInput" list="pref-list" placeholder="例: 神奈川" oninput="onPrefInput()"
+                                        value="${savedPref}"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         style="color:#1e293b;background:#fff;">
-                                        <option value="">選択してください</option>
-                                    </select>
+                                    <datalist id="pref-list"></datalist>
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 font-medium mb-2">市区町村</label>
-                                    <select id="citySelect"
+                                    <input id="cityInput" list="city-list" placeholder="例: 横浜市"
+                                        value="${savedCity}"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         style="color:#1e293b;background:#fff;">
-                                        <option value="">都道府県を先に選択</option>
-                                    </select>
+                                    <datalist id="city-list"></datalist>
                                 </div>
-                                <button onclick="saveCityFromSelect()" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700">
+                                <button onclick="saveCityFromInput()" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700">
                                     登録する
                                 </button>
                             </div>
@@ -543,20 +543,35 @@
         }
 
         function populatePrefSelect() {
-            const sel = document.getElementById('prefSelect');
-            if (!sel) return;
+            const dl = document.getElementById('pref-list');
+            if (!dl) return;
             const prefs = Object.keys(prefList).sort();
-            sel.innerHTML = '<option value="">選択してください</option>' +
-                prefs.map(p => '<option value="' + p + '"' + (p === savedPref ? ' selected' : '') + '>' + p + '</option>').join('');
+            dl.innerHTML = prefs.map(p => '<option value="' + p + '">').join('');
             if (savedPref) populateCitySelect(savedPref);
         }
 
         function populateCitySelect(pref) {
-            const sel = document.getElementById('citySelect');
-            if (!sel) return;
+            const dl = document.getElementById('city-list');
+            if (!dl) return;
             const cities = (prefList[pref] || []);
-            sel.innerHTML = '<option value="">選択してください</option>' +
-                cities.map(c => '<option value="' + c + '"' + (c === savedCity ? ' selected' : '') + '>' + c + '</option>').join('');
+            dl.innerHTML = cities.map(c => '<option value="' + c + '">').join('');
+        }
+
+        function onPrefInput() {
+            const pref = document.getElementById('prefInput')?.value;
+            if (prefList[pref]) populateCitySelect(pref);
+        }
+
+        function saveCityFromInput() {
+            const pref = document.getElementById('prefInput')?.value;
+            const city = document.getElementById('cityInput')?.value;
+            if (!pref || !prefList[pref]) { alert('正しい都道府県を入力してください'); return; }
+            if (!city || !prefList[pref].includes(city)) { alert('正しい市区町村を入力してください'); return; }
+            savedPref = pref;
+            savedCity = city;
+            localStorage.setItem('parentPref', pref);
+            localStorage.setItem('parentCity', city);
+            render();
         }
 
         async function fetchPrefList() {
@@ -569,21 +584,7 @@
             }
         }
 
-        function onPrefChange() {
-            const pref = document.getElementById('prefSelect').value;
-            populateCitySelect(pref);
-        }
 
-        function saveCityFromSelect() {
-            const pref = document.getElementById('prefSelect')?.value;
-            const city = document.getElementById('citySelect')?.value;
-            if (!pref || !city) { alert('都道府県と市区町村を選択してください'); return; }
-            savedPref = pref;
-            savedCity = city;
-            localStorage.setItem('parentPref', pref);
-            localStorage.setItem('parentCity', city);
-            render();
-        }
 
         function goToHome() { currentPage = 'home'; statusMessage = ''; history.pushState(null, '', '#home'); render(); window.scrollTo(0,0); }
         function goToList() {
