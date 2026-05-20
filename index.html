@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.62</title>
+    <title>Local Note v3.63</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -554,7 +554,7 @@
         function populateCitySelect(pref) {
             const sel = document.getElementById('citySelect');
             if (!sel) return;
-            const cities = (prefList[pref] || []);
+            const cities = (prefList[pref] || []).slice().sort((a, b) => a.localeCompare(b, 'ja'));
             sel.innerHTML = '<option value="">選択してください</option>' +
                 cities.map(c => '<option value="' + c + '"' + (c === savedCity ? ' selected' : '') + '>' + c + '</option>').join('');
         }
