@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.64</title>
+    <title>Local Note</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -21,6 +21,7 @@
     <script>
         // ---- 設定 ----
         const API_URL = 'https://seido-notify-api-646437906593.asia-northeast1.run.app';
+        const APP_VERSION = 'v3.65';
         const MAX_STORED_NOTICES = 1000; // localStorageに保存する上限件数（fetchedAtが古いものから削除）
 
         // ---- テーマ ----
@@ -74,7 +75,21 @@
         const DEFAULT_INTERESTS = CATEGORIES;
         let readIds = new Set(JSON.parse(localStorage.getItem('readIds') || '[]'));
         let newIds = new Set(JSON.parse(localStorage.getItem('newIds') || '[]'));
-        let lastFetchedAt = localStorage.getItem('lastFetchedAt') || null;
+
+        // lastFetchedAtは、都道府県+市区町村ごとに別々のキーで保存する
+        // （市区町村名だけだと、異なる都道府県に同名の市区町村が存在しうるため）
+        function lastFetchedAtKey(pref, city) {
+            return `lastFetchedAt_${pref}_${city}`;
+        }
+        function getLastFetchedAt() {
+            if (!savedPref || !savedCity) return null;
+            return localStorage.getItem(lastFetchedAtKey(savedPref, savedCity));
+        }
+        function setLastFetchedAt(value) {
+            if (!savedPref || !savedCity) return;
+            localStorage.setItem(lastFetchedAtKey(savedPref, savedCity), value);
+        }
+
         // statusFilter: 'all' | 'unread' | 'read'
         let statusFilter = localStorage.getItem('statusFilter') || 'all';
         let categoryOpen = false;
@@ -124,7 +139,7 @@
             render();
 
             try {
-                const since = localStorage.getItem('lastFetchedAt');
+                const since = getLastFetchedAt();
                 const cityParam = savedCity ? `&city=${encodeURIComponent(savedCity)}` : '';
                 const url = since
                     ? `${API_URL}?since=${encodeURIComponent(since)}${cityParam}`
@@ -174,9 +189,9 @@
                     statusMessage = '新着情報はありません';
                 }
 
-                // サーバー時刻を保存（次回のsinceに使用）
+                // サーバー時刻を保存（次回のsinceに使用。都道府県+市区町村ごとに別々に保存する）
                 if (data.serverTime) {
-                    localStorage.setItem('lastFetchedAt', data.serverTime);
+                    setLastFetchedAt(data.serverTime);
                 }
 
             } catch (err) {
@@ -256,7 +271,7 @@
                         </div>
                         <div class="text-center mb-12">
                             <h1 class="text-3xl md:text-5xl font-bold text-gray-800 mb-4">
-                                Local Note
+                                Local Note <span class="text-xs text-gray-400 align-top">${APP_VERSION}</span>
                             </h1>
                             <p class="text-gray-600 text-lg">
                                 地域の情報をお届けします
@@ -423,13 +438,7 @@
         function saveCity(event) {
             event.preventDefault();
             const city = document.getElementById('cityInput').value.trim();
-            if (city && city !== savedCity) {
-                localStorage.setItem('parentCity', city);
-                savedCity = city;
-                // 都市変更時はlastFetchedAtのみクリア（新しい都市の全件を取得）
-                localStorage.removeItem('lastFetchedAt');
-                lastFetchedAt = null;
-            } else if (city) {
+            if (city) {
                 localStorage.setItem('parentCity', city);
                 savedCity = city;
             }
@@ -484,11 +493,15 @@
             localStorage.removeItem('parentPref');
             localStorage.removeItem('parentCity');
             localStorage.removeItem('interests');
-            localStorage.removeItem('lastFetchedAt');
+            // lastFetchedAt_で始まるキーは市区町村ごとに複数存在しうるため、すべて走査して削除する
+            Object.keys(localStorage)
+                .filter(key => key.startsWith('lastFetchedAt_'))
+                .forEach(key => localStorage.removeItem(key));
             localStorage.removeItem('readIds');
             localStorage.removeItem('newIds');
             notices = [];
             savedCity = '';
+            savedPref = '';
             savedInterests = [...DEFAULT_INTERESTS];
             readIds = new Set();
             newIds = new Set();
@@ -615,6 +628,8 @@
         }
 
         // 初期レンダリング
+        document.title = `Local Note ${APP_VERSION}`;
+
         render();
 
         // 起動時に都道府県リストを取得
