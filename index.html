@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Note v3.63</title>
+    <title>Local Note v3.64</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="theme-style"></style>
     <style>
@@ -21,6 +21,7 @@
     <script>
         // ---- 設定 ----
         const API_URL = 'https://seido-notify-api-646437906593.asia-northeast1.run.app';
+        const MAX_STORED_NOTICES = 1000; // localStorageに保存する上限件数（fetchedAtが古いものから削除）
 
         // ---- テーマ ----
         let theme = localStorage.getItem('theme') || 'dark';
@@ -140,7 +141,27 @@
                     const existingIds = new Set(notices.map(n => n.id));
                     const newNotices = data.notices.filter(n => !existingIds.has(n.id));
                     notices = [...newNotices, ...notices];
-                    localStorage.setItem('notices', JSON.stringify(notices));
+
+                    // 保存件数が上限を超えたら、fetchedAtが古いものから削除する
+                    if (notices.length > MAX_STORED_NOTICES) {
+                        notices.sort((a, b) => new Date(b.fetchedAt) - new Date(a.fetchedAt));
+                        notices = notices.slice(0, MAX_STORED_NOTICES);
+                    }
+
+                    try {
+                        localStorage.setItem('notices', JSON.stringify(notices));
+                    } catch (storageErr) {
+                        // 容量超過など、保存に失敗した場合は、さらに件数を絞って再試行する
+                        console.error('notices保存エラー、件数を絞って再試行:', storageErr);
+                        notices.sort((a, b) => new Date(b.fetchedAt) - new Date(a.fetchedAt));
+                        notices = notices.slice(0, Math.floor(MAX_STORED_NOTICES / 2));
+                        try {
+                            localStorage.setItem('notices', JSON.stringify(notices));
+                        } catch (retryErr) {
+                            console.error('notices再保存にも失敗:', retryErr);
+                        }
+                    }
+
                     // 新着IDをnewIdsに追加
                     newNotices.forEach(n => newIds.add(n.id));
                     // 初回取得（newIdsが空）は全件をnewIdsに追加
